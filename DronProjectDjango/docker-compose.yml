@@ -1,0 +1,52 @@
+version: '3.8'
+services:
+  web:
+    build: .
+    volumes:
+      - .:/code
+    ports:
+      - "8000:8000"
+    depends_on:
+      - db
+      - redis
+      - minio
+
+  db:
+    image: postgres:15
+    environment:
+      POSTGRES_DB: Dron
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: maue_0818
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+
+  redis:
+    image: redis:7
+
+  minio:
+    image: minio/minio
+    command: server /data
+    environment:
+      MINIO_ROOT_USER: minio
+      MINIO_ROOT_PASSWORD: minio123
+    ports:
+      - "9090:9090"
+    volumes:
+      - minio_data:/data
+
+  nginx:
+    image: nginx:stable
+    ports:
+      - "80:80"
+    volumes:
+      - ./nginx.conf:/etc/nginx/nginx.conf:ro
+      - static_volume:/code/static
+      - media_volume:/code/media
+    depends_on:
+      - web
+
+volumes:
+  postgres_data:
+  minio_data:
+  static_volume:
+  media_volume:
