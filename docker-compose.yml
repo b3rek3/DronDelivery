@@ -1,4 +1,5 @@
-# docker-compose.yml
+version: '3.8'
+
 services:
   db:
     image: postgres:15
@@ -13,11 +14,12 @@ services:
 
   minio:
     image: minio/minio
-    command: server /data
+    command: server /data --console-address ":9001"
     env_file:
       - .env
     ports:
-      - "${MINIO_HOST_PORT}:9000"
+      - "${MINIO_HOST_PORT}:9000"     # S3 API порт
+      - "${MINIO_CONSOLE_PORT}:9001"  # Web-консоль
     volumes:
       - minio_data:/data
 
@@ -33,7 +35,6 @@ services:
       - staticfiles:/app/staticfiles
     ports:
       - "8000:8000"
-    # Если вы хотите явно указать настройки (необязательно, manage.py уже делает это)
     environment:
       - DJANGO_SETTINGS_MODULE=djangoProject3.settings
 
