@@ -1,11 +1,9 @@
+version: "3.8"
+
 services:
   db:
     image: postgres:15
     env_file: .env
-    environment:
-      - POSTGRES_DB=${DATABASE_NAME}
-      - POSTGRES_USER=${DATABASE_USER}
-      - POSTGRES_PASSWORD=${DATABASE_PASSWORD}
     volumes:
       - db_data:/var/lib/postgresql/data
 
@@ -14,8 +12,8 @@ services:
     command: server /data --console-address ":9001"
     env_file: .env
     environment:
-      - MINIO_ROOT_USER=${MINIO_ACCESS_KEY}
-      - MINIO_ROOT_PASSWORD=${MINIO_SECRET_KEY}
+      MINIO_ROOT_USER:     ${MINIO_ACCESS_KEY}
+      MINIO_ROOT_PASSWORD: ${MINIO_SECRET_KEY}
     ports:
       - "${MINIO_HOST_PORT}:9000"
       - "${MINIO_CONSOLE_PORT}:9001"
@@ -28,18 +26,15 @@ services:
     depends_on:
       - db
       - minio
+    environment:
+      AWS_ACCESS_KEY_ID:     ${MINIO_ACCESS_KEY}
+      AWS_SECRET_ACCESS_KEY: ${MINIO_SECRET_KEY}
     volumes:
-      - .:/app                   # your code
+      - .:/app
       - staticfiles:/app/staticfiles
     ports:
       - "8000:8000"
-    command:
-      - gunicorn
-      - djangoProject3.wsgi:application
-      - --bind
-      - 0.0.0.0:8000
-      - --workers
-      - "2"
+    # uses the CMD in the Dockerfile
 
   nginx:
     image: nginx:stable-alpine
