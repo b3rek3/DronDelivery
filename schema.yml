@@ -1,0 +1,7 @@
+openapi: 3.0.3
+info:
+  title: Fast Delivery API
+  version: 1.0.0
+  description: Get your food delivered in minutes with our efficient drone service.
+paths: {}
+components: {}
